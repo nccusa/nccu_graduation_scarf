@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-fN1MWWMdFv56MSwn1N/rwb1WCQOufoAwmEFOfbdoJKI=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-0ilkm7wCjTE9LbLTfaRz9XmIlzjYqEh8bLkdqwSCkOM=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -283,12 +283,11 @@ footer p{margin:0;max-width:36em;line-height:1.6}
         </div>
         <div class="num r" aria-hidden="true">27<sup>twenty-seven</sup></div>
       </div>
-      <div class="proto">Prototype · 回答暫不儲存</div>
 
       <div class="block" id="block"></div>
       <div class="obj-wrap"><div class="obj" id="obj"><div class="ground" id="ground"></div></div></div>
       <div class="vert" aria-hidden="true">SCARF</div>
-      <div class="hprog" id="hprog" aria-hidden="true"><span class="hp-t" id="hp-t">往下滑，看它轉一圈</span><span class="hp-bar"><i id="hp-fill"></i></span></div>
+      <div class="hprog" id="hprog" aria-hidden="true"><span class="hp-t" id="hp-t">下滑近看領巾細節</span><span class="hp-bar"><i id="hp-fill"></i></span></div>
 
       <div class="colorcard" id="cc" aria-live="polite">
         <div class="ix" id="cc-ix">01 / 04</div>
@@ -319,7 +318,7 @@ footer p{margin:0;max-width:36em;line-height:1.6}
     <div class="sec-head">
       <div class="eyebrow">Design</div>
       <h2 id="h-design">這次有你一起參與設計</h2>
-      <p>挑底色和校徽的顏色、選校徽和校名，拖曳到你想要的位置。每一種組合都直接使用政大的官方標誌。</p>
+      <p>挑底色和校徽的顏色、選校徽和校名，拖曳到你想要的位置。每一種組合都直接使用政大的官方標誌</p>
     </div>
     <div class="studio">
       <div class="stage" id="stage">
@@ -419,7 +418,7 @@ footer p{margin:0;max-width:36em;line-height:1.6}
 
   <footer>
     <div><h4>為什麼不能自由改校徽？</h4><p>依《國立政治大學品牌識別手冊》（2025.08 第 4 版），校徽與標準字不得變形、改色或重新排列。這裡的每一種組合都直接使用手冊的官方檔案，並依底色自動套用正確配色。</p></div>
-    <div><h4>接下來會發生什麼</h4><p>學生會將整理所有同學的設計偏好與購買意願，連同企劃書送交學校紀念品美學委員會審議。通過後，第一批以成本價開放預購。</p></div>
+    <div><h4>接下來我們會</h4><p>學生會將整理所有同學的設計偏好與購買意願，連同企劃書送交學校紀念品美學委員會審議。若有機會通過，第一批將以最優惠價格開放預購。</p></div>
     <div><h4>政大學生會 第 27 屆</h4><p>NCCU Student Association</p></div>
   </footer>
 </main>
@@ -820,7 +819,7 @@ function heroFrame(){
   hpFill.style.transform = `scaleX(${p.toFixed(4)})`;
   hpEl.style.opacity = String(1 - clamp((p - .95)/.05, 0, 1));
 }
-const HP_TEXT = ["往下滑，看它轉一圈", "繡上政大校徽", "四種配色，慢慢看", "往下開始設計"];
+const HP_TEXT = ["下滑近看領巾細節", "繡上政大校徽", "四種配色等你挑選", "往下開始設計"];
 const hpEl = document.getElementById("hprog"), hpText = document.getElementById("hp-t"), hpFill = document.getElementById("hp-fill");
 let hpStage = -1;
 

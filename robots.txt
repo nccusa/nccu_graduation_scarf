@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nccusa.github.io/nccu_graduation_scarf/sitemap.xml

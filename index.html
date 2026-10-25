@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-0RSNUmbWucDNCWOGrv9Ii3EZucsEA0oZZsWDqOCakx4=' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-cBcN63O3kEBK0AqJIcsZXkp2+j8ngc1k5LYum9jGLyg=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -196,6 +196,11 @@ input:checked + .chip{border:2px solid var(--accent);padding:11.5px 17.5px;backg
 input:focus-visible + .chip{outline:2px solid var(--accent);outline-offset:3px}
 select{font:inherit;font-size:16px;color:var(--fg);background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:16px 18px;width:100%;max-width:26em;-webkit-appearance:none;appearance:none}
 .err{color:var(--red);font-size:14px;min-height:1.3em;margin:0}
+.ts{min-height:0}
+.ts:not(:empty){margin-top:-8px}
+.again-note{margin:-8px 0 0;font-size:13.5px;color:var(--gray)}
+.privacy{margin:0;font-size:12.5px;line-height:1.6;color:var(--gray);max-width:40em}
+.submit[disabled]{opacity:.6;cursor:progress;transform:none;box-shadow:none}
 .submit{justify-self:start;border:0;border-radius:980px;padding:16px 30px;background:var(--accent);color:#fff;font:600 17px var(--cjk);letter-spacing:.02em;cursor:pointer;transition:transform .15s,box-shadow .15s,background-color .15s}
 .submit:active{transform:scale(.97)}
 .submit:hover{background:#1B3466}
@@ -368,8 +373,11 @@ footer p{margin:0;max-width:36em;line-height:1.6}
             <option>教育學院</option><option>資訊學院</option><option>創新國際學院</option><option>校友</option><option>其他</option>
           </select>
         </div>
+        <div class="ts" id="ts"></div>
         <p class="err" id="err" role="alert"></p>
-        <button class="submit" type="submit">送出設計</button>
+        <p class="again-note" id="again-note" hidden>這台裝置已經填過了，再送出一次會更新你上次的回答。</p>
+        <button class="submit" type="submit" id="submit-btn">送出設計</button>
+        <p class="privacy">本調查不蒐集姓名、學號、信箱、IP 等任何個人資料。每台裝置只會保留最後一次的回答，並以 Cloudflare Turnstile 防止機器人大量送出。</p>
       </div>
       <p class="fine">圖片為示意，最終款式以學校審核通過的版本為準。</p>
     </form>
@@ -383,7 +391,7 @@ footer p{margin:0;max-width:36em;line-height:1.6}
     <div class="result">
       <img id="share-img" alt="你設計的政大畢業領巾分享圖">
       <div>
-        <h3>長按或右鍵儲存圖片，分享到限時動態。</h3>
+        <h3>已收到你的意見！長按或右鍵儲存圖片，分享到限時動態。</h3>
         <p>標記學生會，讓更多政大人一起表態。</p>
         <dl id="summary"></dl>
         <button class="ghost" type="button" id="again">再設計一款</button>
@@ -796,13 +804,68 @@ function shareCard(){
 }
 
 const form = document.getElementById("qform");
-form.addEventListener("submit", ev => {
+// ---------- sending: Turnstile + Supabase Edge Function ----------
+const API = {url:"https://elcphnjrswnclggxjlbd.supabase.co/functions/v1/submit", key:"sb_publishable_kULscWLJwcFp4rNsN-0YVg_bp7OLCRK", site:"0x4AAAAAAFlPdJvHFFi16Nlv"};
+function deviceId(){
+  let id = null;
+  try { id = localStorage.getItem("nccu_scarf_device"); } catch(e){}
+  if (!id || !/^[0-9a-f-]{36}$/i.test(id)){
+    id = (crypto.randomUUID ? crypto.randomUUID() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)));
+    try { localStorage.setItem("nccu_scarf_device", id); } catch(e){}
+  }
+  return id;
+}
+try { if (localStorage.getItem("nccu_scarf_done")) document.getElementById("again-note").hidden = false; } catch(e){}
+let tsId = null, tsToken = "", tsWaiters = [];
+function tsReady(){
+  if (tsId !== null || !window.turnstile) return;
+  tsId = turnstile.render("#ts", {
+    sitekey: API.site, appearance: "interaction-only", language: "zh-tw", action: "submit",
+    callback: tok => { tsToken = tok; tsWaiters.splice(0).forEach(f => f(tok)); },
+    "expired-callback": () => { tsToken = ""; },
+    "error-callback": () => { tsToken = ""; }
+  });
+}
+window.onTurnstileLoad = tsReady; tsReady();
+function getToken(){
+  if (tsToken) return Promise.resolve(tsToken);
+  return new Promise((res, rej) => { tsWaiters.push(res); setTimeout(() => rej(new Error("captcha-timeout")), 20000); });
+}
+function resetToken(){ tsToken = ""; try { if (tsId !== null) turnstile.reset(tsId); } catch(e){} }
+
+const btn = document.getElementById("submit-btn");
+form.addEventListener("submit", async ev => {
   ev.preventDefault();
   const err = document.getElementById("err");
   if (!S.buy){ err.textContent = "請先選擇你可以接受的價格範圍。"; return; }
   if (!S.qty){ err.textContent = "請選擇預計購買的數量。"; return; }
   if (!S.one){ err.textContent = "請回答：第一批只出一種顏色的看法。"; return; }
   err.textContent = "";
+  btn.disabled = true; btn.textContent = "確認中…";
+  const college = document.getElementById("q-college").value || "";
+  try {
+    const token = await getToken();
+    btn.textContent = "送出中…";
+    const headers = {"Content-Type":"application/json", apikey: API.key};
+    if (API.key.startsWith("eyJ")) headers.Authorization = "Bearer " + API.key;
+    const r = await fetch(API.url, {method:"POST", headers, body: JSON.stringify({
+      token, device_id: deviceId(), stole_color: S.base, logo_color: S.logo, left_logo: S.left, right_logo: S.right,
+      pos_left: Math.round(S.yL), pos_right: Math.round(S.yR), price_range: S.buy, quantity: S.qty, one_color: S.one, college
+    })});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) throw new Error(j.error || ("http-" + r.status));
+  } catch(e){
+    resetToken();
+    btn.disabled = false; btn.textContent = "送出設計";
+    err.textContent = /captcha/.test(e.message)
+      ? "沒有通過機器人驗證，請稍等幾秒再按一次送出。"
+      : "送出失敗，可能是網路不穩，請再試一次。";
+    return;
+  }
+  resetToken();
+  try { localStorage.setItem("nccu_scarf_done", "1"); } catch(e){}
+  btn.disabled = false; btn.textContent = "送出設計";
+  document.getElementById("again-note").hidden = false;
   document.getElementById("share-img").src = shareCard();
   const b = base(), bd = border(), lo = LEFTS.find(o=>o.id===S.left), ro = RIGHTS.find(o=>o.id===S.right);
   const rows = [["底色",`${b.name}（${b.pt}）`],["滾邊",bd.name],["校徽顏色",`${logo().name}（${logo().pt}）`],["左側",lo.name],["右側",ro.name],
@@ -810,7 +873,7 @@ form.addEventListener("submit", ev => {
   document.getElementById("summary").innerHTML = rows.map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   try { if (window.gtag) gtag("event", "design_submit", {
     stole_color: S.base, logo_color: S.logo, left_logo: S.left, right_logo: S.right,
-    price_range: S.buy, quantity: S.qty, one_color: S.one, college: document.getElementById("q-college").value || "未填"
+    price_range: S.buy, quantity: S.qty, one_color: S.one, college: college || "未填"
   }); } catch(e){}
   const res = document.getElementById("result"); res.hidden = false;
   res.scrollIntoView({behavior: RM ? "auto" : "smooth", block:"start"});
@@ -861,6 +924,7 @@ try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", rende
 let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { sizeHero(); if (stageView){ stageView.resize(); } sizeCanvas(); heroFrame(); }, 120); });
 })();
 </script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad" async defer></script>
 
 </body>
 </html>

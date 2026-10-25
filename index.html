@@ -85,64 +85,87 @@ body{background:var(--bg);color:var(--fg);font-family:var(--cjk);font-size:15px;
 .sec-head h2{font-family:var(--cjk);font-weight:700;font-size:clamp(32px,4.6vw,56px);line-height:1.12;letter-spacing:-.01em;margin:0;text-wrap:balance}
 .sec-head p{margin:0;color:var(--gray);font-size:clamp(16px,1.6vw,19px);line-height:1.55}
 
-.studio{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:64px;align-items:start}
-.stage{position:sticky;top:20px;align-self:start;display:grid;gap:14px}
-.canvas-bg{position:relative;background:#FFFFFF}
-.stage canvas{display:block;width:min(100%, 70vh);height:auto;aspect-ratio:1/1;margin:0 auto;touch-action:none;cursor:grab}
+.studio{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:56px;align-items:start}
+.stage{position:sticky;top:16px;align-self:start;display:grid;gap:12px;justify-items:center}
+.canvas-bg{position:relative;background:#FFFFFF;width:100%}
+.stage canvas{display:block;width:min(100%, calc(100svh - 250px), 640px);height:auto;aspect-ratio:1/1;margin:0 auto;touch-action:none;cursor:grab}
 .stage canvas.dragging{cursor:grabbing}
-.pos{display:grid;gap:12px;width:min(100%, 70vh);margin:0 auto;padding:16px 20px;border:1px solid var(--line);border-radius:18px}
+.pos{display:grid;gap:4px;width:min(100%, 560px);padding:10px 18px 8px;border:1px solid var(--line);border-radius:16px;background:#fff;transition:border-color .15s}
 .pos-h{display:flex;justify-content:space-between;align-items:baseline}
-.pos-h b{font-size:15px;font-weight:600}
-.pos-h span{font-size:13px;color:var(--gray)}
-.sl{display:grid;grid-template-columns:5.2em minmax(0,1fr) 3.4em;align-items:center;gap:14px;font-size:14px}
-.sl output{font-family:var(--grot);font-variant-numeric:tabular-nums;text-align:right;font-size:14px;color:var(--gray)}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;cursor:pointer}
-input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:var(--line)}
+.pos-h b{font-size:14px;font-weight:600}
+.pos-h span{font-size:12px;color:var(--gray)}
+.sl{display:grid;grid-template-columns:5.2em minmax(0,1fr) 3.4em;align-items:center;gap:12px;font-size:13.5px}
+.sl output{font-family:var(--grot);font-variant-numeric:tabular-nums;text-align:right;font-size:13.5px;color:var(--gray)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(var(--accent),var(--accent)) 0/var(--fill,50%) 100% no-repeat,var(--line)}
 input[type=range]::-moz-range-track{height:4px;border-radius:4px;background:var(--line)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;margin-top:-10px;box-shadow:0 1px 4px rgba(0,0,0,.25),0 0 0 .5px rgba(0,0,0,.08)}
-input[type=range]::-moz-range-thumb{width:24px;height:24px;border:0;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:4px;background:var(--accent)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;margin-top:-9px;box-shadow:0 1px 4px rgba(0,0,0,.25),0 0 0 .5px rgba(0,0,0,.08);transition:transform .15s}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.18)}
 input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
-.hint{text-align:center;color:var(--gray);font-size:13px;margin:0}
+.hint{text-align:center;color:var(--gray);font-size:12.5px;margin:0}
+.peek{position:absolute;top:8px;left:50%;transform:translate(-50%,-6px);background:rgba(29,29,31,.86);color:#fff;font-size:12.5px;padding:6px 12px;border-radius:999px;opacity:0;pointer-events:none;white-space:nowrap;transition:opacity .15s,transform .15s}
+.peek.on{opacity:1;transform:translate(-50%,0)}
 
-.choices{display:grid;gap:44px}
-.group h3{font-family:var(--cjk);font-weight:700;font-size:24px;line-height:1.25;margin:0}
-.group h3 span{color:var(--gray);font-weight:700}
-.group .now{margin:10px 0 16px;font-size:15px;color:var(--fg)}
+.choices{display:grid;gap:26px;position:sticky;top:16px}
+.gh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+.group h3{font-family:var(--cjk);font-weight:700;font-size:19px;line-height:1.25;margin:0;white-space:nowrap}
+.group .now{margin:0;font-size:13.5px;color:var(--gray);text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 fieldset{border:0;margin:0;padding:0;min-width:0}
 legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);opacity:0;pointer-events:none}
 
-.swatches{display:flex;flex-wrap:wrap;gap:18px}
-.sw{display:block;cursor:pointer}
-.sw .dot.foil{background:linear-gradient(135deg,#E9EBEE,#A9AEB6 45%,#F3F4F6 60%,#9DA2AA)!important}
-input:disabled + .sw{opacity:.22;cursor:not-allowed}
-.sw .dot{display:block;width:40px;height:40px;border-radius:50%;box-shadow:inset 0 0 0 4px var(--pipe),inset 0 0 0 5px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.06)}
+.swatches{display:flex;flex-wrap:wrap;gap:14px}
+.swatches > div{position:relative}
+.sw{position:relative;display:block;cursor:pointer;padding:3px;border-radius:50%}
+.sw .dot{display:block;width:38px;height:38px;border-radius:50%;box-shadow:inset 0 0 0 4px var(--pipe),inset 0 0 0 5px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.06);transition:transform .2s cubic-bezier(.3,1.6,.5,1),box-shadow .2s}
 input:checked + .sw .dot{outline:2px solid var(--accent);outline-offset:3px}
 input:focus-visible + .sw .dot{outline:2px solid var(--accent);outline-offset:3px}
+input:disabled + .sw{opacity:.22;cursor:not-allowed}
 
-.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.opt{display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:14px;cursor:pointer;height:100%;border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;background:#fff;transition:border-color .15s}
-.opt:hover{border-color:#86868B}
-.opt .tile{height:56px;display:grid;place-items:center}
-.opt .tile img{display:block;max-height:56px;max-width:64px;width:auto;height:auto;object-fit:contain;filter:brightness(0)}
-.opt .nm{font-size:15px;font-weight:500;line-height:1.35}
-input:checked + .opt{border:2px solid var(--accent);padding:13.5px 15.5px}
+.opts{display:grid;gap:10px}
+.opts.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.opts.c5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.opts > div{min-width:0}
+.opt{position:relative;display:grid;grid-template-rows:50px auto;justify-items:center;align-content:start;gap:8px;cursor:pointer;height:100%;border:1.5px solid var(--line);border-radius:14px;padding:12px 6px 10px;background:#fff;text-align:center;transition:border-color .18s,box-shadow .18s,transform .18s}
+.opt .tile{height:50px;width:100%;display:grid;place-items:center}
+.opt .tile img{display:block;max-height:50px;max-width:100%;width:auto;height:auto;object-fit:contain;filter:brightness(0);transition:transform .25s cubic-bezier(.3,1.4,.5,1)}
+.opt .nm{font-size:12.5px;font-weight:500;line-height:1.3}
+input:checked + .opt{border:2px solid var(--accent);padding:11.5px 5.5px 9.5px}
+input:checked + .opt::after{content:"";position:absolute;top:6px;right:6px;width:16px;height:16px;border-radius:50%;background:var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.3l2.2 2.2 4.8-5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat;animation:pop .28s cubic-bezier(.3,1.6,.5,1)}
 input:focus-visible + .opt{outline:2px solid var(--accent);outline-offset:3px}
-.note{display:flex;gap:10px;align-items:baseline;font-size:13px;color:var(--gray);margin-top:16px;line-height:1.55}
+@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+.note{display:flex;gap:10px;align-items:baseline;font-size:12.5px;color:var(--gray);margin-top:12px;line-height:1.5}
 .note .k{font-family:var(--grot);font-weight:600;color:var(--accent);white-space:nowrap;font-size:12px}
 
+/* pointer devices: lift, magnify, live preview on hover */
+@media (hover:hover) and (pointer:fine){
+  .sw:hover .dot{transform:scale(1.14);box-shadow:inset 0 0 0 4px var(--pipe),inset 0 0 0 5px rgba(0,0,0,.08),0 6px 14px rgba(0,0,0,.16)}
+  input:disabled + .sw:hover .dot{transform:none}
+  .opt:hover{border-color:#86868B;transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.08)}
+  input:checked + .opt:hover{border-color:var(--accent)}
+  .opt:hover .tile img{transform:scale(1.08)}
+  .opt:active{transform:translateY(0) scale(.98)}
+  .chip:hover{border-color:#86868B;background:#FAFAFC;transform:translateY(-1px)}
+  .submit:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(35,65,125,.28)}
+  input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.12)}
+  .pos:hover{border-color:#C7C7CC}
+}
 .qs{display:grid;gap:40px;max-width:760px}
 .q h3{font-family:var(--cjk);font-weight:700;font-size:22px;line-height:1.35;margin:0 0 6px}
 .q .qd{color:var(--gray);font-size:15px;margin:0 0 16px}
 .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .chips > span{display:block}
-.chip{display:flex;height:100%;align-items:center;min-height:60px;cursor:pointer;border:1.5px solid var(--line);border-radius:14px;padding:12px 18px;font-size:16px;line-height:1.35;background:#fff;transition:border-color .15s}
+.chip{display:flex;height:100%;align-items:center;min-height:60px;cursor:pointer;border:1.5px solid var(--line);border-radius:14px;padding:12px 18px;font-size:16px;line-height:1.35;background:#fff;transition:border-color .15s,background-color .15s,transform .15s}
 .chip:hover{border-color:#86868B}
-input:checked + .chip{border:2px solid var(--accent);padding:11.5px 17.5px;background:#F4F7FC}
+input:checked + .chip{border:2px solid var(--accent);padding:11.5px 17.5px;background:#F4F7FC;animation:press .22s ease}
+@keyframes press{50%{transform:scale(.97)}}
 input:focus-visible + .chip{outline:2px solid var(--accent);outline-offset:3px}
 select{font:inherit;font-size:16px;color:var(--fg);background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:16px 18px;width:100%;max-width:26em;-webkit-appearance:none;appearance:none}
 .err{color:var(--red);font-size:14px;min-height:1.3em;margin:0}
-.submit{justify-self:start;border:0;border-radius:980px;padding:16px 30px;background:var(--accent);color:#fff;font:600 17px var(--cjk);letter-spacing:.02em;cursor:pointer}
+.submit{justify-self:start;border:0;border-radius:980px;padding:16px 30px;background:var(--accent);color:#fff;font:600 17px var(--cjk);letter-spacing:.02em;cursor:pointer;transition:transform .15s,box-shadow .15s,background-color .15s}
+.submit:active{transform:scale(.97)}
 .submit:hover{background:#1B3466}
 .submit:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .fine{color:var(--gray);font-size:13px;margin:14px 0 0}
@@ -151,7 +174,7 @@ select{font:inherit;font-size:16px;color:var(--fg);background:#fff;border:1.5px 
 .result img{width:100%;max-width:380px;display:block;border-radius:22px;box-shadow:0 30px 70px rgba(0,0,0,.14)}
 .result h3{font-family:var(--cjk);font-weight:700;font-size:clamp(24px,2.8vw,34px);line-height:1.25;margin:0 0 12px;text-wrap:balance}
 .result p{margin:0;color:var(--gray);max-width:34em;font-size:16px}
-.result dl{display:grid;grid-template-columns:5.5em minmax(0,1fr);margin:24px 0;border-top:1px solid var(--line)}
+.result dl{display:grid;grid-template-columns:6.5em minmax(0,1fr);margin:24px 0;border-top:1px solid var(--line)}
 .result dt,.result dd{margin:0;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
 .result dt{color:var(--gray)}
 .ghost{font:500 15px var(--cjk);border:0;background:none;color:var(--accent);padding:0;cursor:pointer}
@@ -171,10 +194,18 @@ footer p{margin:0;max-width:36em;line-height:1.6}
   .colorcard{top:auto;bottom:24px;padding-right:0}
   .botrow{grid-template-columns:1fr}
   .meta{display:none}
-  .studio{grid-template-columns:1fr;gap:40px}
-  .stage{position:relative;top:0}
-  .stage canvas,.pos{width:min(100%, 58vh)}
-  .opts{grid-template-columns:1fr}
+  .studio{grid-template-columns:1fr;gap:20px}
+  .stage{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:#fff;grid-template-columns:auto minmax(0,1fr);align-items:center;justify-items:stretch;gap:14px;padding-block:8px;margin-inline:calc(-1 * max(16px, env(safe-area-inset-left, 0px)));padding-inline:max(16px, env(safe-area-inset-left, 0px));border-bottom:1px solid var(--line);box-shadow:0 10px 16px -14px rgba(0,0,0,.25)}
+  .canvas-bg{width:auto}
+  .stage canvas{width:min(44vw, 30svh, 260px)}
+  .pos{width:100%;border:0;padding:0;gap:2px;background:transparent}
+  .pos-h span{display:none}
+  .sl{grid-template-columns:1fr auto;grid-template-areas:"l o" "r r";gap:0 8px;font-size:13px}
+  .sl input{grid-area:r}
+  .sl output{grid-area:o;font-size:12.5px}
+  .hint,.peek{display:none}
+  .choices{position:relative;top:0;gap:28px}
+  .opts.c5{grid-template-columns:repeat(3,minmax(0,1fr))}
   .result{grid-template-columns:1fr;gap:32px}
   footer{grid-template-columns:1fr}
   .sec{padding-block:80px 0}
@@ -201,7 +232,7 @@ footer p{margin:0;max-width:36em;line-height:1.6}
 
       <div class="block" id="block"></div>
       <div class="obj-wrap"><div class="obj" id="obj"><div class="ground" id="ground"></div></div></div>
-      <div class="vert" aria-hidden="true">STOLE</div>
+      <div class="vert" aria-hidden="true">SCARF</div>
 
       <div class="colorcard" id="cc" aria-live="polite">
         <div class="ix" id="cc-ix">01 / 04</div>
@@ -213,14 +244,14 @@ footer p{margin:0;max-width:36em;line-height:1.6}
       <div class="botrow">
         <div class="lede">
           <strong>1927 — 2027</strong>
-          台大、成大、清大都有美式畢業領巾，政大也該有。學生會正在向學校申請校徽授權，用成本價做政大自己的領巾，在百年校慶這一屆畢業。
-          <div class="scrollhint"><i>↓</i>往下滑，設計你的那一條</div>
+          台大、成大、清大目前都有美式畢業領巾供同學選擇，現在政大也準備有自己的美式畢業領巾啦！學生會正向學校申請校徽授權，希望以實惠的價格，讓政大同學也能穿上屬於自己的美式畢業領巾，一起紀念百年校慶這個重要時刻。
+          <div class="scrollhint"><i>↓</i>往下滑，一起參與設計</div>
         </div>
         <div class="meta">
           <div class="cap"><b>單邊寬</b><br>13 cm</div>
           <div class="cap"><b>單邊長</b><br>85 cm</div>
-          <div class="cap"><b>預計售價</b><br>NT$300–360</div>
-          <div class="cap"><b>配色依據</b><br>政大品牌識別手冊 v4</div>
+          <div class="cap"><b>預計售價</b><br>待定</div>
+          <div class="cap"><b>配色依據</b><br>政大品牌識別手冊</div>
         </div>
       </div>
     </div>
@@ -231,7 +262,7 @@ footer p{margin:0;max-width:36em;line-height:1.6}
   <section class="sec" aria-labelledby="h-design">
     <div class="sec-head">
       <div class="eyebrow">Design</div>
-      <h2 id="h-design">設計你的那一條。</h2>
+      <h2 id="h-design">這次有你一起參與設計</h2>
       <p>挑底色和校徽的顏色、選校徽和校名，拖曳到你想要的位置。每一種組合都直接使用政大的官方標誌。</p>
     </div>
     <div class="studio">
@@ -243,28 +274,25 @@ footer p{margin:0;max-width:36em;line-height:1.6}
           <label class="sl" for="yR">右側校名<input type="range" id="yR" min="0" max="100" value="33"><output id="oR" for="yR"></output></label>
         </div>
         <p class="hint">也可以直接在圖上拖曳校徽與校名</p>
+        <div class="peek" id="peek" aria-hidden="true"></div>
       </div>
 
       <div class="choices">
         <div class="group">
-          <h3>顏色。<span>選一個你喜歡的。</span></h3>
-          <p class="now" id="base-name">品牌藍　PANTONE 288 C</p>
+          <div class="gh"><h3>顏色</h3><p class="now" id="base-name">品牌藍　PANTONE 288 C</p></div>
           <fieldset><legend>底色</legend><div class="swatches" id="base"></div></fieldset>
         </div>
         <div class="group">
-          <h3>校徽顏色。<span>刺繡的線色。</span></h3>
-          <p class="now" id="logo-name">白　反白</p>
+          <div class="gh"><h3>校徽顏色</h3><p class="now" id="logo-name">白　反白</p></div>
           <fieldset><legend>校徽顏色</legend><div class="swatches" id="logo"></div></fieldset>
         </div>
         <div class="group">
-          <h3>左側。<span>校徽。</span></h3>
-          <p class="now">選一種官方校徽</p>
-          <fieldset><legend>左側校徽</legend><div class="opts" id="left"></div></fieldset>
+          <div class="gh"><h3>左側校徽</h3><p class="now" id="left-name"></p></div>
+          <fieldset><legend>左側校徽</legend><div class="opts c3" id="left"></div></fieldset>
         </div>
         <div class="group">
-          <h3>右側。<span>校名。</span></h3>
-          <p class="now">中文書法、標準字或英文</p>
-          <fieldset><legend>右側校名</legend><div class="opts" id="right"></div></fieldset>
+          <div class="gh"><h3>右側校名</h3><p class="now" id="right-name"></p></div>
+          <fieldset><legend>右側校名</legend><div class="opts c5" id="right"></div></fieldset>
           <div class="note"><span class="k" id="vi-code">手冊 D</span><span id="vi-text">深色底一律使用反白校徽，依《政大品牌識別手冊》自動配色。</span></div>
         </div>
       </div>
@@ -274,15 +302,15 @@ footer p{margin:0;max-width:36em;line-height:1.6}
   <section class="sec" aria-labelledby="h-q">
     <div class="sec-head">
       <div class="eyebrow">Your say</div>
-      <h2 id="h-q">最後三題。</h2>
+      <h2 id="h-q">我們需要你的意見</h2>
       <p>大約 30 秒。你的回答會整理成同學意見，附在送交學校的企劃書裡。</p>
     </div>
     <form id="qform" novalidate>
       <div class="qs">
         <fieldset class="q">
-          <legend>預計售價 300–360 元，你會購買嗎？</legend>
-          <h3 aria-hidden="true">預計售價 300–360 元，你會購買嗎？</h3>
-          <p class="qd" aria-hidden="true">總訂購量越多，價格越低。</p>
+          <legend>你可以接受的價格範圍是？</legend>
+          <h3 aria-hidden="true">你可以接受的價格範圍是？</h3>
+          <p class="qd" aria-hidden="true">售價還在評估中，你的回答會幫助我們定價。</p>
           <div class="chips" id="q-buy"></div>
         </fieldset>
         <fieldset class="q" id="q-qty-wrap">
@@ -349,14 +377,14 @@ const PHOTO = {base_navy:"base/navy.webp", base_red:"base/red.webp", base_pearl:
 const BASES = [
   {id:"navy",  name:"品牌藍", pt:"PANTONE 288 C",  hex:"#23417D", pipe:"#FFFFFF", dark:true},
   {id:"red",   name:"政大紅", pt:"PANTONE 2350 C", hex:"#BE3C32", pipe:"#FFFFFF", dark:true},
-  {id:"pearl", name:"珍珠白", pt:"WHITE",          hex:"#F7F7F5", pipe:"#34383F", dark:false},
-  {id:"stone", name:"暖灰",   pt:"PANTONE 2330 C", hex:"#D0CAC2", pipe:"#34383F", dark:false}
+  {id:"pearl", name:"珍珠白", pt:"PANTONE 11-0601 TCX",          hex:"#F7F7F5", pipe:"#34383F", dark:false},
+  {id:"stone", name:"暖霧灰", pt:"PANTONE 2330 C", hex:"#D0CAC2", pipe:"#34383F", dark:false}
 ];
 const BORDERS = [
   {id:"white", name:"白",     pt:"WHITE",          hex:"#FFFFFF"},
   {id:"navy",  name:"品牌藍", pt:"PANTONE 288 C",  hex:"#23417D"},
   {id:"ink",   name:"墨灰",   pt:"BLACK 6 C 85%",  hex:"#34383F"},
-  {id:"stone", name:"暖灰",   pt:"PANTONE 2330 C", hex:"#D0CAC2"}
+  {id:"stone", name:"暖霧灰", pt:"PANTONE 2330 C", hex:"#D0CAC2"}
 ];
 // sizes in base-photo pixels (14.4 px = 1 cm)
 const LEFTS = [
@@ -540,7 +568,7 @@ document.getElementById("logo").innerHTML = LOGOS.map(o => `
   <label class="sw" for="logo-${o.id}" title="${o.name}"><span class="dot${o.id==="silver"?" foil":""}" style="background:${o.hex};--pipe:transparent"></span><span class="vh">${o.name}</span></label></div>`).join("");
 optGroup(document.getElementById("left"),"left",LEFTS,"left");
 optGroup(document.getElementById("right"),"right",RIGHTS,"right");
-chipGroup(document.getElementById("q-buy"),"buy",["一定會","可能會","不會"]);
+chipGroup(document.getElementById("q-buy"),"buy",["300 元以下","300–400 元","400–500 元"]);
 chipGroup(document.getElementById("q-qty"),"qty",["1 條","2 條","3 條","4 條以上"]);
 chipGroup(document.getElementById("q-one"),"one",["可以，哪個顏色我都會買","只有我喜歡的顏色才會買","希望多色可選，貴一點也沒關係"]);
 
@@ -561,7 +589,7 @@ function syncLogoName(){ const n = document.getElementById("logo-name"); if (n) 
 document.addEventListener("change", ev => {
   const t = ev.target;
   if (["base","border","left","right","logo"].includes(t.name)){ S[t.name] = t.value; if (t.name==="base") syncBorderAvailability(); if (t.name==="logo") syncLogoName(); render(); }
-  if (t.name === "buy"){ S.buy = t.value; document.getElementById("q-qty-wrap").hidden = (t.value === "不會"); }
+  if (t.name === "buy") S.buy = t.value;
   if (t.name === "qty") S.qty = t.value;
   if (t.name === "one") S.one = t.value;
 });
@@ -569,6 +597,50 @@ for (const id of ["yL","yR"]) document.getElementById(id).addEventListener("inpu
 
 const stage = document.getElementById("stage");
 
+
+// ---------- names, slider fill, hover preview ----------
+function syncOptNames(){
+  const l = document.getElementById("left-name"), r = document.getElementById("right-name");
+  if (l) l.textContent = LEFTS.find(o => o.id === S.left).name;
+  if (r) r.textContent = RIGHTS.find(o => o.id === S.right).name;
+}
+function syncFill(){ for (const id of ["yL","yR"]){ const el = document.getElementById(id); el.style.setProperty("--fill", el.value + "%"); } }
+document.addEventListener("change", ev => { if (["left","right"].includes(ev.target.name)) syncOptNames(); });
+for (const id of ["yL","yR"]) document.getElementById(id).addEventListener("input", syncFill);
+
+const NAMEOF = {
+  base: v => BASES.find(o => o.id === v).name, logo: v => "校徽 " + LOGOS.find(o => o.id === v).name,
+  left: v => LEFTS.find(o => o.id === v).name, right: v => RIGHTS.find(o => o.id === v).name
+};
+let preview = null, previewLabel = null;
+const peek = document.getElementById("peek");
+// a committed choice always wins over the preview it came from
+document.addEventListener("change", () => { preview = null; previewLabel = null; peek && peek.classList.remove("on"); }, true);
+if (matchMedia("(hover:hover) and (pointer:fine)").matches){
+  document.addEventListener("pointerover", ev => {
+    const lab = ev.target.closest && ev.target.closest(".choices label.sw, .choices label.opt");
+    if (!lab || lab === previewLabel) return;
+    const inp = document.getElementById(lab.htmlFor);
+    if (!inp || inp.disabled || inp.checked || !NAMEOF[inp.name]) return;
+    if (!preview) preview = {base:S.base, logo:S.logo, left:S.left, right:S.right};
+    else Object.assign(S, preview);
+    previewLabel = lab;
+    S[inp.name] = inp.value;
+    if (inp.name === "base" && !LOGO_OK[S.base].includes(S.logo)) S.logo = LOGO_OK[S.base][0];
+    if (peek){ peek.textContent = "預覽　" + NAMEOF[inp.name](inp.value); peek.classList.add("on"); }
+    render();
+  });
+  document.addEventListener("pointerout", ev => {
+    if (!previewLabel) return;
+    const to = ev.relatedTarget;
+    if (to && previewLabel.contains(to)) return;
+    if (to && to.closest && to.closest(".choices label.sw, .choices label.opt")) return; // next pointerover takes over
+    if (preview) Object.assign(S, preview);
+    preview = null; previewLabel = null; peek && peek.classList.remove("on");
+    render();
+  });
+}
+syncOptNames(); syncFill();
 
 const G3 = null; // 3D model retired; the hero will play filmed footage instead
 // ---------- hero: filmed 360° turn, scrubbed by scroll ----------
@@ -695,14 +767,14 @@ const form = document.getElementById("qform");
 form.addEventListener("submit", ev => {
   ev.preventDefault();
   const err = document.getElementById("err");
-  if (!S.buy){ err.textContent = "請先回答：你會購買嗎？"; return; }
-  if (S.buy !== "不會" && !S.qty){ err.textContent = "請選擇預計購買的數量。"; return; }
+  if (!S.buy){ err.textContent = "請先選擇你可以接受的價格範圍。"; return; }
+  if (!S.qty){ err.textContent = "請選擇預計購買的數量。"; return; }
   if (!S.one){ err.textContent = "請回答：第一批只出一種顏色的看法。"; return; }
   err.textContent = "";
   document.getElementById("share-img").src = shareCard();
   const b = base(), bd = border(), lo = LEFTS.find(o=>o.id===S.left), ro = RIGHTS.find(o=>o.id===S.right);
   const rows = [["底色",`${b.name}（${b.pt}）`],["滾邊",bd.name],["校徽顏色",`${logo().name}（${logo().pt}）`],["左側",lo.name],["右側",ro.name],
-    ["位置",`校徽 ${cmLabel(S.yL)}・校名 ${cmLabel(S.yR)}`],["購買",S.buy + (S.buy!=="不會" ? `，${S.qty}` : "")],["單色",S.one]];
+    ["位置",`校徽 ${cmLabel(S.yL)}・校名 ${cmLabel(S.yR)}`],["可接受價格",S.buy],["購買數量",S.qty],["單色",S.one]];
   document.getElementById("summary").innerHTML = rows.map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   const res = document.getElementById("result"); res.hidden = false;
   res.scrollIntoView({behavior: RM ? "auto" : "smooth", block:"start"});

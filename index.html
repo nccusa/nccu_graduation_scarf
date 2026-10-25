@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-0ilkm7wCjTE9LbLTfaRz9XmIlzjYqEh8bLkdqwSCkOM=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-AJedPRMf+HOQMQWMF3RhIxOzMnYP3VRhh+CcHf4PSUE=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -14,6 +14,8 @@
 
   gtag('config', 'G-QJR54LK9SD');
 </script>
+<link rel="preload" as="image" href="f000.webp">
+<link rel="preload" as="image" href="base-navy.webp">
 <title>畢業領巾實驗室｜政大美式畢業領巾設計與意見調查</title>
 <meta name="description" content="政大學生會「畢業領巾實驗室」：台大、成大、清大都有美式畢業領巾，現在政大也準備推出自己的美式畢業領巾。挑選底色、校徽顏色、校徽與校名，一起參與設計，你的意見會整理進送交學校的企劃書。">
 <meta name="keywords" content="政大, 政治大學, 美式畢業領巾, 畢業領巾, 畢業, 學位服, 政大學生會, NCCU, graduation stole">
@@ -76,6 +78,11 @@ body{background:var(--bg);color:var(--fg);font-family:var(--cjk);font-size:15px;
 html{scroll-snap-type:y proximity}
 .hold{position:absolute;left:0;width:1px;height:1px;scroll-snap-align:start;pointer-events:none}
 .hprog{position:absolute;z-index:4;left:50%;bottom:18px;transform:translateX(-50%);display:grid;justify-items:center;gap:8px;pointer-events:none;transition:opacity .3s}
+.hp-skip{pointer-events:auto;margin-top:2px;font:500 12px var(--cjk);letter-spacing:.02em;color:var(--accent);background:#fff;border:1px solid #D2D2D7;border-radius:999px;padding:6px 14px;cursor:pointer;transition:border-color .15s,background-color .15s,transform .15s}
+.hp-skip:hover{border-color:var(--accent);background:#F4F7FC}
+.hp-skip:active{transform:scale(.97)}
+.hp-skip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hprog.done .hp-skip{visibility:hidden}
 .hp-t{font-size:12.5px;font-weight:500;letter-spacing:.04em;color:#3A3A3E;white-space:nowrap}
 .hp-bar{position:relative;width:132px;height:3px;border-radius:3px;background:#E3E5EA;overflow:hidden}
 .hp-bar i{position:absolute;inset:0;background:var(--accent);transform-origin:left;transform:scaleX(0)}
@@ -287,7 +294,7 @@ footer p{margin:0;max-width:36em;line-height:1.6}
       <div class="block" id="block"></div>
       <div class="obj-wrap"><div class="obj" id="obj"><div class="ground" id="ground"></div></div></div>
       <div class="vert" aria-hidden="true">SCARF</div>
-      <div class="hprog" id="hprog" aria-hidden="true"><span class="hp-t" id="hp-t">下滑近看領巾細節</span><span class="hp-bar"><i id="hp-fill"></i></span></div>
+      <div class="hprog" id="hprog"><span class="hp-t" id="hp-t" aria-hidden="true">下滑近看領巾細節</span><span class="hp-bar" aria-hidden="true"><i id="hp-fill"></i></span><button type="button" class="hp-skip" id="hp-skip">跳過動畫，直接設計 ↓</button></div>
 
       <div class="colorcard" id="cc" aria-live="polite">
         <div class="ix" id="cc-ix">01 / 04</div>
@@ -757,7 +764,11 @@ function buildHero(){
   sizeHero();
   // first frame and the four stills first, then the rest of the turn in order
   loadImg("f000.webp").then(im => { frames[0] = im; heroReady = true; heroFrame(); });
-  (async () => { for (let i = 1; i < NF; i++){ frames[i] = await loadImg(`f${String(i).padStart(3,"0")}.webp`); } })();
+  const order = [], seen = new Set([0]);
+  for (const step of [16, 8, 4, 2, 1]) for (let i = 0; i < NF; i += step) if (!seen.has(i)){ seen.add(i); order.push(i); }
+  let next = 0;
+  const worker = async () => { while (next < order.length){ const i = order[next++]; frames[i] = await loadImg(`f${String(i).padStart(3,"0")}.webp`); if (heroReady) heroKick(); } };
+  for (let k = 0; k < 6; k++) worker();
 }
 function sizeHero(){
   const r = objEl.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -818,6 +829,7 @@ function heroFrame(){
   if (stage !== hpStage){ hpStage = stage; hpText.textContent = HP_TEXT[stage]; }
   hpFill.style.transform = `scaleX(${p.toFixed(4)})`;
   hpEl.style.opacity = String(1 - clamp((p - .95)/.05, 0, 1));
+  hpEl.classList.toggle("done", p > .97);
 }
 const HP_TEXT = ["下滑近看領巾細節", "繡上政大校徽", "四種配色等你挑選", "往下開始設計"];
 const hpEl = document.getElementById("hprog"), hpText = document.getElementById("hp-t"), hpFill = document.getElementById("hp-fill");
@@ -831,7 +843,7 @@ function heroTargetNow(){
 }
 function heroTick(){
   const d = heroTarget - heroP;
-  heroP = Math.abs(d) < .0004 ? heroTarget : heroP + d * .1;
+  heroP = Math.abs(d) < .0004 ? heroTarget : heroP + d * Math.min(.35, .1 + Math.abs(d) * .9);
   heroFrame();
   heroAnim = heroP !== heroTarget ? requestAnimationFrame(heroTick) : 0;
 }
@@ -853,6 +865,13 @@ function blockW(t){
 window.addEventListener("scroll", heroKick, {passive:true});
 window.addEventListener("resize", () => { placeHolds(); heroKick(); });
 placeHolds(); heroP = heroTarget = heroTargetNow();
+
+document.getElementById("hp-skip").addEventListener("click", () => {
+  const target = document.getElementById("h-design").closest(".sec");
+  heroP = 1; heroTarget = 1;
+  window.scrollTo({top: target.getBoundingClientRect().top + scrollY - 8, behavior: "auto"});
+  heroFrame();
+});
 
 // ---------- share card (1080 x 1920 story) ----------
 function shareCard(){

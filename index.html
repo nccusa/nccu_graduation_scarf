@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-lwO8k1v3JwCSGmAxRExy1PhmsJu/ScvBlINmwZ+JufU=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-T84u6Q/8om6NLpz0g0FMBXYLTanvv6oUqzfOKrt53Ls=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -361,8 +361,8 @@ footer p{margin:0;max-width:36em;line-height:1.6}
         <div class="canvas-bg"><canvas id="cv" width="1254" height="1254" aria-label="領巾預覽，可上下拖曳校徽與校名"></canvas></div>
         <div class="pos">
           <div class="pos-h"><b>位置</b><span>從頸後量起</span></div>
-          <label class="sl" for="yL">左側校徽<span class="rw" style="--d:0.35" title="雙擊回到標準位置"><input type="range" id="yL" min="0" max="100" value="35" aria-describedby="pos-tip"><i class="tick" aria-hidden="true"></i><b class="tick-l" aria-hidden="true">標準</b></span><output id="oL" for="yL"></output></label>
-          <label class="sl" for="yR">右側校名<span class="rw" style="--d:0.33" title="雙擊回到標準位置"><input type="range" id="yR" min="0" max="100" value="33" aria-describedby="pos-tip"><i class="tick" aria-hidden="true"></i><b class="tick-l" aria-hidden="true">標準</b></span><output id="oR" for="yR"></output></label>
+          <label class="sl" for="yL">左側校徽<span class="rw" style="--d:0.34" title="雙擊回到標準位置"><input type="range" id="yL" min="0" max="100" value="34" aria-describedby="pos-tip"><i class="tick" aria-hidden="true"></i><b class="tick-l" aria-hidden="true">標準</b></span><output id="oL" for="yL"></output></label>
+          <label class="sl" for="yR">右側校名<span class="rw" style="--d:0.34" title="雙擊回到標準位置"><input type="range" id="yR" min="0" max="100" value="34" aria-describedby="pos-tip"><i class="tick" aria-hidden="true"></i><b class="tick-l" aria-hidden="true">標準</b></span><output id="oR" for="yR"></output></label>
         </div>
         <p class="hint" id="pos-tip">也可以直接在圖上拖曳・雙擊滑桿回到標準位置</p>
         <div class="peek" id="peek" aria-hidden="true"></div>
@@ -498,7 +498,7 @@ const PIPING = {navy:"white", red:"white", pearl:"ink", stone:"ink"};
 // Disallowed base/border pairs: same colour, or too little contrast to read as piping.
 const BAD_PAIR = {navy:["navy"], red:[], pearl:["white"], stone:["stone"]};
 
-const S = {base:"navy", border:"white", logo:"white", left:"circ_en", right:"callig_v", yL:35, yR:33, gown:false, ruler:false, buy:"", qty:"", one:""};
+const S = {base:"navy", border:"white", logo:"white", left:"circ_en", right:"callig_v", yL:34, yR:34, gown:false, ruler:false, buy:"", qty:"", one:""};
 
 // ---------- geometry ----------
 // The product photos are 1254 x 1254; the canvas shows them whole.
@@ -540,17 +540,19 @@ const LOGO_OK = {navy:["white","silver"], red:["white","silver","ink"], pearl:["
 const logo = () => LOGOS.find(l => l.id === S.logo) || LOGOS[0];
 const logoColor = () => logo().hex;
 
+// balanced sizes for every left/right pair (base-photo px), solved offline so both sides carry similar embroidery weight
+const PAIRS = {"circ_en|callig_v":{"lw":126.7,"rw":93.1,"rh":208.8,"vert":true},"circ_en|std_v":{"lw":108.0,"rw":43.0,"rh":257.8,"vert":true},"circ_en|callig_h":{"lw":79.2,"rw":132.5,"rh":51.2,"vert":false},"circ_en|nccu":{"lw":79.2,"rw":122.4,"rh":31.8,"vert":false},"circ_en|en_b":{"lw":79.2,"rw":132.5,"rh":25.9,"vert":false},"circ_zh|callig_v":{"lw":129.6,"rw":91.8,"rh":205.9,"vert":true},"circ_zh|std_v":{"lw":110.9,"rw":42.5,"rh":254.9,"vert":true},"circ_zh|callig_h":{"lw":82.1,"rw":132.5,"rh":51.2,"vert":false},"circ_zh|nccu":{"lw":79.2,"rw":122.4,"rh":31.8,"vert":false},"circ_zh|en_b":{"lw":79.2,"rw":132.5,"rh":25.9,"vert":false},"seal|callig_v":{"lw":99.4,"rw":96.9,"rh":217.4,"vert":true},"seal|std_v":{"lw":85.0,"rw":44.9,"rh":269.3,"vert":true},"seal|callig_h":{"lw":72.0,"rw":132.5,"rh":51.2,"vert":false},"seal|nccu":{"lw":72.0,"rw":122.4,"rh":31.8,"vert":false},"seal|en_b":{"lw":72.0,"rw":132.5,"rh":25.9,"vert":false}};
 function emblemBoxes(){
-  const lo = LEFTS.find(o => o.id === S.left), ro = RIGHTS.find(o => o.id === S.right);
-  const li = imgs[lo.id], ri = imgs[ro.id];
-  const lw = lo.w, lh = lw * li.naturalHeight / li.naturalWidth;
-  let rw, rh;
-  if (ro.h){ rh = ro.h; rw = rh * ri.naturalWidth / ri.naturalHeight; if (rw > ro.maxw){ rw = ro.maxw; rh = rw * ri.naturalHeight / ri.naturalWidth; } }
-  else { rw = ro.w; rh = rw * ri.naturalHeight / ri.naturalWidth; }
-  const ly = yFrom(S.yL), ry = yFrom(S.yR);
+  const li = imgs[S.left], ri = imgs[S.right], p = PAIRS[S.left + "|" + S.right];
+  const lw = p.lw, lh = lw * li.naturalHeight / li.naturalWidth;
+  const rw = p.rw, rh = p.rh;
+  const ly = yFrom(S.yL);
+  // vertical wordmarks start level with the top of the seal; horizontal ones sit on its centre line
+  let ry = p.vert ? yFrom(S.yR) - lh/2 + rh/2 : yFrom(S.yR);
+  ry = Math.min(ry, 1130 - rh/2);
   return {
-    left:{key:lo.id, x:CX_L - lw/2, y:ly - lh/2, w:lw, h:lh},
-    right:{key:ro.id, x:CX_R - rw/2, y:ry - rh/2, w:rw, h:rh}
+    left:{key:S.left, x:CX_L - lw/2, y:ly - lh/2, w:lw, h:lh},
+    right:{key:S.right, x:CX_R - rw/2, y:ry - rh/2, w:rw, h:rh}
   };
 }
 
@@ -737,7 +739,7 @@ if (matchMedia("(hover:hover) and (pointer:fine)").matches){
 syncOptNames(); syncFill();
 
 // ---------- position sliders: standard mark, gentle snap, double-click/tap to reset ----------
-const POS_DEF = {yL:35, yR:33};
+const POS_DEF = {yL:34, yR:34};
 function syncDef(){
   for (const id of ["yL","yR"]){
     const el = document.getElementById(id);
@@ -814,7 +816,7 @@ function drawStill(id, alphaLogo, alphaAll){
   hx.drawImage(imgs["base_"+id], 0, 0, SW, SH);
   if (alphaLogo > 0){
     const keep = {base:S.base, logo:S.logo, left:S.left, right:S.right, yL:S.yL, yR:S.yR};
-    Object.assign(S, {base:id, logo:LOGO_OK[id][0], left:"circ_en", right:"callig_v", yL:35, yR:33});
+    Object.assign(S, {base:id, logo:LOGO_OK[id][0], left:"circ_en", right:"callig_v", yL:34, yR:34});
     const b = base(), col = logoColor(), bx = emblemBoxes();
     hx.globalAlpha *= alphaLogo;
     for (const kk of ["left","right"]){ const e = bx[kk]; hx.drawImage(stitched(e, col, imgs["shade_"+id], 1.2), e.x-2, e.y-2, e.w+4, e.h+4); }

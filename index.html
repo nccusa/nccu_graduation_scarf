@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-TO1XQjLLGfrK87JQ5g9rd/5erxHE5lcLh7gm90AxcpY=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-48nIyRPjaUoTdIB616Kg9pX83zyfOIoP1t2RhQ6UdBk=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -986,20 +986,21 @@ function deviceId(){
   return id;
 }
 try { if (localStorage.getItem("nccu_scarf_done")) document.getElementById("again-note").hidden = false; } catch(e){}
-let tsId = null, tsToken = "", tsWaiters = [];
+let tsId = null, tsToken = "", tsWaiters = [], tsRejects = [];
 function tsReady(){
   if (tsId !== null || !window.turnstile) return;
   tsId = turnstile.render("#ts", {
     sitekey: API.site, appearance: "interaction-only", language: "zh-tw", action: "submit",
-    callback: tok => { tsToken = tok; tsWaiters.splice(0).forEach(f => f(tok)); },
+    callback: tok => { tsToken = tok; tsRejects.length = 0; tsWaiters.splice(0).forEach(f => f(tok)); },
     "expired-callback": () => { tsToken = ""; },
-    "error-callback": () => { tsToken = ""; }
+    "error-callback": code => { tsToken = ""; tsWaiters.length = 0; tsRejects.splice(0).forEach(f => f(new Error("captcha:widget-" + code))); return true; }
   });
 }
 window.onTurnstileLoad = tsReady; tsReady();
 function getToken(){
   if (tsToken) return Promise.resolve(tsToken);
-  return new Promise((res, rej) => { tsWaiters.push(res); setTimeout(() => rej(new Error("captcha-timeout")), 20000); });
+  if (!window.turnstile) return Promise.reject(new Error("captcha:script-blocked"));
+  return new Promise((res, rej) => { tsWaiters.push(res); tsRejects.push(rej); setTimeout(() => rej(new Error("captcha:no-token")), 20000); });
 }
 function resetToken(){ tsToken = ""; try { if (tsId !== null) turnstile.reset(tsId); } catch(e){} }
 
@@ -1023,13 +1024,14 @@ form.addEventListener("submit", async ev => {
       pos_left: Math.round(S.yL), pos_right: Math.round(S.yR), price_range: S.buy, quantity: S.qty, one_color: S.one, college
     })});
     const j = await r.json().catch(() => ({}));
-    if (!r.ok || !j.ok) throw new Error(j.error || ("http-" + r.status));
+    if (!r.ok || !j.ok) throw new Error((j.error || "http") + ":" + (j.detail || r.status));
   } catch(e){
     resetToken();
     btn.disabled = false; btn.textContent = "送出設計";
-    err.textContent = /captcha/.test(e.message)
+    const code = String(e.message || "").replace(/^captcha:/, "");
+    err.textContent = (/captcha/.test(e.message)
       ? "沒有通過機器人驗證，請稍等幾秒再按一次送出。"
-      : "送出失敗，可能是網路不穩，請再試一次。";
+      : "送出失敗，可能是網路不穩，請再試一次。") + "（錯誤代碼：" + code + "）";
     return;
   }
   resetToken();

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ObIpnIfBueChuAZnyyo/Z+/zAjJEWRvz0sDh1AN8Xl4=' 'sha256-kdMAr91+qGdlk0tCe0n3ZqeuKDmm4nMVfPFzbL60F64=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ObIpnIfBueChuAZnyyo/Z+/zAjJEWRvz0sDh1AN8Xl4=' 'sha256-4DrmIs7C6wiG3hJ5tPgjj5P/r03FTfue0L2VJm4rsqY=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -1156,14 +1156,14 @@ document.addEventListener("change", ev => {
   const t = ev.target;
   if (GROUPS[t.name]){
     interacted = true; totalChanges++; changeCount[t.name] = (changeCount[t.name] || 0) + 1;
-    tr("option_select", {group: GROUPS[t.name], value: t.value, from_value: lastVal[t.name], nth_change: changeCount[t.name], seconds_since_load: secs(T0)});
+    tr("option_select", {group: GROUPS[t.name], choice: t.value, from_choice: lastVal[t.name], nth_change: changeCount[t.name], seconds_since_load: secs(T0)});
     lastVal[t.name] = t.value;
     // a colour change can force a new emblem colour; record that too
-    if (t.name === "base" && S.logo !== lastVal.logo){ tr("option_select", {group: "logo_color", value: S.logo, from_value: lastVal.logo, nth_change: 0, auto: "yes"}); lastVal.logo = S.logo; }
+    if (t.name === "base" && S.logo !== lastVal.logo){ tr("option_select", {group: "logo_color", choice: S.logo, from_choice: lastVal.logo, nth_change: 0, auto: "yes"}); lastVal.logo = S.logo; }
   }
-  if (["buy", "qty", "one"].includes(t.name)) tr("question_answer", {question: {buy: "price_range", qty: "quantity", one: "one_color"}[t.name], value: t.value});
-  if (t.id === "q-college") tr("question_answer", {question: "college", value: t.value || "未填"});
-  if (t.id === "yL" || t.id === "yR"){ interacted = true; totalChanges++; tr("position_change", {side: t.id === "yL" ? "left" : "right", value: +t.value, method: "slider"}); }
+  if (["buy", "qty", "one"].includes(t.name)) tr("question_answer", {question: {buy: "price_range", qty: "quantity", one: "one_color"}[t.name], choice: t.value});
+  if (t.id === "q-college") tr("question_answer", {question: "college", choice: t.value || "未填"});
+  if (t.id === "yL" || t.id === "yR"){ interacted = true; totalChanges++; tr("position_change", {side: t.id === "yL" ? "left" : "right", position: +t.value, method: "slider"}); }
 });
 
 // 5. options people hover over (desktop only): a "considered but maybe not chosen" signal
@@ -1179,7 +1179,7 @@ if (!IS_MOBILE){
   function endHover(){
     if (!hov) return;
     const ms = Math.round(performance.now() - hov.t);
-    if (ms >= 500) tr("option_preview", {group: hov.group, value: hov.value, dwell_ms: Math.min(ms, 60000)});
+    if (ms >= 500) tr("option_preview", {group: hov.group, choice: hov.value, dwell_ms: Math.min(ms, 60000)});
     hov = null;
   }
   document.addEventListener("pointerout", ev => { if (hov && !hov.lab.contains(ev.relatedTarget)) endHover(); });
@@ -1190,10 +1190,10 @@ let dragStart = null;
 cv.addEventListener("pointerdown", () => { dragStart = {yL: S.yL, yR: S.yR}; });
 cv.addEventListener("pointerup", () => {
   if (!dragStart) return;
-  for (const [k, side] of [["yL", "left"], ["yR", "right"]]) if (S[k] !== dragStart[k]){ interacted = true; totalChanges++; tr("position_change", {side, value: Math.round(S[k]), method: "drag"}); }
+  for (const [k, side] of [["yL", "left"], ["yR", "right"]]) if (S[k] !== dragStart[k]){ interacted = true; totalChanges++; tr("position_change", {side, position: Math.round(S[k]), method: "drag"}); }
   dragStart = null;
 });
-document.querySelectorAll(".rw").forEach(w => w.addEventListener("dblclick", () => tr("position_change", {side: w.querySelector("input").id === "yL" ? "left" : "right", value: 34, method: "reset"})));
+document.querySelectorAll(".rw").forEach(w => w.addEventListener("dblclick", () => tr("position_change", {side: w.querySelector("input").id === "yL" ? "left" : "right", position: 34, method: "reset"})));
 
 // 7. submit outcome, plus a full snapshot of the final design
 window.__trackSubmit = (stage, extra) => {

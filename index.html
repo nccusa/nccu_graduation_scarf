@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-c+bW8aYrMkbV9d3g3vDoYJFCnwwlsKxViTf2pGFucd0=' 'sha256-48nIyRPjaUoTdIB616Kg9pX83zyfOIoP1t2RhQ6UdBk=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-TUL9XTU1dNi2paHaWodw/kee2ayYmr20ZDlyCrR2H3w=' 'sha256-kdMAr91+qGdlk0tCe0n3ZqeuKDmm4nMVfPFzbL60F64=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -12,7 +12,7 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-QJR54LK9SD');
+  gtag('config', 'G-QJR54LK9SD', Object.assign({ allow_google_signals: false, allow_ad_personalization_signals: false }, /[?&]debug/.test(location.search) ? { debug_mode: true } : {}));
 </script>
 <link rel="preload" as="image" href="f000.webp">
 <link rel="preload" as="image" href="base-navy.webp">
@@ -237,8 +237,10 @@ input:checked + .chip{border:2px solid var(--accent);padding:11.5px 17.5px;backg
 input:focus-visible + .chip{outline:2px solid var(--accent);outline-offset:3px}
 select{font:inherit;font-size:16px;color:var(--fg);background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:16px 18px;width:100%;max-width:26em;-webkit-appearance:none;appearance:none}
 .err{color:var(--red);font-size:14px;min-height:1.3em;margin:0}
-.ts{min-height:0}
+.ts{min-height:0;transition:min-height .25s ease}
+.ts:has(iframe){min-height:65px}
 .ts:not(:empty){margin-top:-8px}
+.err.ok{color:#1F7A4D}
 .again-note{margin:-8px 0 0;font-size:13.5px;color:var(--gray)}
 .privacy{margin:0;font-size:12.5px;line-height:1.6;color:var(--gray);max-width:40em}
 .submit[disabled]{opacity:.6;cursor:progress;transform:none;box-shadow:none}
@@ -439,7 +441,7 @@ footer p{margin:0;max-width:36em;line-height:1.6}
         <p class="err" id="err" role="alert"></p>
         <p class="again-note" id="again-note" hidden>這台裝置已經填過了，再送出一次會更新你上次的回答。</p>
         <button class="submit" type="submit" id="submit-btn">送出設計</button>
-        <p class="privacy">本調查不蒐集姓名、學號、信箱、IP 等任何個人資料。每台裝置只會保留最後一次的回答，並以 Cloudflare Turnstile 防止機器人大量送出。</p>
+        <p class="privacy">本調查不蒐集姓名、學號、信箱等任何個人資料，每台裝置只會保留最後一次的回答，並以 Cloudflare Turnstile 防止機器人大量送出。網站另以 Google Analytics 匿名統計瀏覽與點選情形，用來了解大家的設計偏好。</p>
       </div>
       <p class="fine">圖片為示意，最終款式以學校審核通過的版本為準。</p>
     </form>
@@ -986,51 +988,64 @@ function deviceId(){
   return id;
 }
 try { if (localStorage.getItem("nccu_scarf_done")) document.getElementById("again-note").hidden = false; } catch(e){}
-let tsId = null, tsToken = "", tsWaiters = [], tsRejects = [];
+let tsId = null, tsToken = "", tsFail = "", tsWaiters = [], tsRejects = [];
 function tsReady(){
   if (tsId !== null || !window.turnstile) return;
   tsId = turnstile.render("#ts", {
     sitekey: API.site, appearance: "interaction-only", language: "zh-tw", action: "submit",
-    callback: tok => { tsToken = tok; tsRejects.length = 0; tsWaiters.splice(0).forEach(f => f(tok)); },
+    callback: tok => { tsToken = tok; tsFail = ""; tsRejects.length = 0; tsWaiters.splice(0).forEach(f => f(tok)); clearStaleError(); },
     "expired-callback": () => { tsToken = ""; },
-    "error-callback": code => { tsToken = ""; tsWaiters.length = 0; tsRejects.splice(0).forEach(f => f(new Error("captcha:widget-" + code))); return true; }
+    "error-callback": code => { tsToken = ""; tsFail = "widget-" + code; tsWaiters.length = 0; tsRejects.splice(0).forEach(f => f(new Error("captcha:widget-" + code))); return true; }
   });
 }
 window.onTurnstileLoad = tsReady; tsReady();
 function getToken(){
   if (tsToken) return Promise.resolve(tsToken);
   if (!window.turnstile) return Promise.reject(new Error("captcha:script-blocked"));
-  return new Promise((res, rej) => { tsWaiters.push(res); tsRejects.push(rej); setTimeout(() => rej(new Error("captcha:no-token")), 20000); });
+  if (tsFail) return Promise.reject(new Error("captcha:" + tsFail));
+  return new Promise((res, rej) => { tsWaiters.push(res); tsRejects.push(rej); setTimeout(() => rej(new Error("captcha:no-token")), 15000); });
 }
-function resetToken(){ tsToken = ""; try { if (tsId !== null) turnstile.reset(tsId); } catch(e){} }
+function resetToken(){ tsToken = ""; tsFail = ""; try { if (tsId !== null) turnstile.reset(tsId); } catch(e){} }
+function clearStaleError(){
+  const err = document.getElementById("err");
+  if (err.dataset.kind === "captcha"){ err.textContent = "驗證完成，請再按一次送出。"; err.dataset.kind = "ok"; err.classList.add("ok"); }
+}
 
 const btn = document.getElementById("submit-btn");
 form.addEventListener("submit", async ev => {
   ev.preventDefault();
   const err = document.getElementById("err");
+  err.classList.remove("ok"); err.dataset.kind = "";
   if (!S.buy){ err.textContent = "請先選擇你可以接受的價格範圍。"; return; }
   if (!S.qty){ err.textContent = "請選擇預計購買的數量。"; return; }
   if (!S.one){ err.textContent = "請回答：第一批只出一種顏色的看法。"; return; }
   err.textContent = "";
   btn.disabled = true; btn.textContent = "確認中…";
+  if (window.__trackSubmit) __trackSubmit("try");
   const college = document.getElementById("q-college").value || "";
   try {
-    const token = await getToken();
+    // 驗證過不了（有些瀏覽器會擋 Cloudflare）也照樣送出，後端會另外標記，不讓使用者卡住
+    let token = "", note = "";
+    try { token = await getToken(); } catch(ce){ note = String(ce.message || "").replace(/^captcha:/, "").slice(0, 50); }
     btn.textContent = "送出中…";
+    if (!token){ const wait = 11000 - performance.now(); if (wait > 0) await new Promise(r => setTimeout(r, wait)); }
     const headers = {"Content-Type":"application/json", apikey: API.key};
     if (API.key.startsWith("eyJ")) headers.Authorization = "Bearer " + API.key;
     const r = await fetch(API.url, {method:"POST", headers, body: JSON.stringify({
-      token, device_id: deviceId(), stole_color: S.base, logo_color: S.logo, left_logo: S.left, right_logo: S.right,
+      token, captcha_note: note, dwell: Math.round(performance.now()/1000), device_id: deviceId(), stole_color: S.base, logo_color: S.logo, left_logo: S.left, right_logo: S.right,
       pos_left: Math.round(S.yL), pos_right: Math.round(S.yR), price_range: S.buy, quantity: S.qty, one_color: S.one, college
     })});
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.ok) throw new Error((j.error || "http") + ":" + (j.detail || r.status));
+    window.__verified = j.verified !== false;
   } catch(e){
     resetToken();
     btn.disabled = false; btn.textContent = "送出設計";
     const code = String(e.message || "").replace(/^captcha:/, "");
-    err.textContent = (/captcha/.test(e.message)
-      ? "沒有通過機器人驗證，請稍等幾秒再按一次送出。"
+    if (window.__trackSubmit) __trackSubmit("fail", {result: "fail", code: code.slice(0, 90)});
+    err.dataset.kind = "net"; err.classList.remove("ok");
+    err.textContent = (/^too-fast/.test(code) ? "填得太快了，請再看一下設計，幾秒後再送出。"
+      : /^busy/.test(code) ? "目前送出的人很多，請過一兩分鐘再試一次。"
       : "送出失敗，可能是網路不穩，請再試一次。") + "（錯誤代碼：" + code + "）";
     return;
   }
@@ -1043,10 +1058,7 @@ form.addEventListener("submit", async ev => {
   const rows = [["底色",`${b.name}（${b.pt}）`],["滾邊",bd.name],["校徽顏色",`${logo().name}（${logo().pt}）`],["左側",lo.name],["右側",ro.name],
     ["位置",`校徽 ${cmLabel(S.yL)}・校名 ${cmLabel(S.yR)}`],["可接受價格",S.buy],["購買數量",S.qty],["單色",S.one]];
   document.getElementById("summary").innerHTML = rows.map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
-  try { if (window.gtag) gtag("event", "design_submit", {
-    stole_color: S.base, logo_color: S.logo, left_logo: S.left, right_logo: S.right,
-    price_range: S.buy, quantity: S.qty, one_color: S.one, college: college || "未填"
-  }); } catch(e){}
+  if (window.__trackSubmit) __trackSubmit("ok");
   const res = document.getElementById("result"); res.hidden = false;
   res.scrollIntoView({behavior: RM ? "auto" : "smooth", block:"start"});
 });
@@ -1094,6 +1106,119 @@ const archivo = document.fonts && document.fonts.load ? document.fonts.load("800
 Promise.all([loadAll(), fontsReady, archivo]).then(() => { buildHero(); buildStage(); heroFrame(); sizeCanvas(); if (stageView){ stageView.resize(); stageDraw(); } });
 try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render); new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]}); }catch(e){}
 let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { sizeHero(); if (stageView){ stageView.resize(); } sizeCanvas(); heroFrame(); }, 120); });
+// ---------- analytics: how people explore, not just what they submit ----------
+// Everything here is anonymous: no names, emails or free text. GA4 event/param names stay within its limits
+// (names ≤ 40 chars, values ≤ 100 chars, ≤ 25 params per event).
+const T0 = performance.now();
+const IS_MOBILE = matchMedia("(pointer:coarse)").matches;
+const tr = (name, params) => { try { if (window.gtag) gtag("event", name, Object.assign({device_kind: IS_MOBILE ? "mobile" : "desktop"}, params || {})); } catch(e){} };
+const secs = since => Math.round((performance.now() - since) / 100) / 10;
+let interacted = false, submitted = false, totalChanges = 0, furthest = "hero";
+const changeCount = {};
+
+// 1. how far people watch the opening film
+const heroMarks = new Set();
+let skipUntil = 0; // jumping past the film with the button is not "watching" it
+document.getElementById("h-cta").addEventListener("click", () => { skipUntil = performance.now() + 2000; }, true);
+window.addEventListener("scroll", () => {
+  if (performance.now() < skipUntil) return;
+  const p = heroTargetNow();
+  for (const m of [25, 50, 75, 100]) if (p * 100 >= m - 0.5 && !heroMarks.has(m)){ heroMarks.add(m); tr("hero_progress", {percent: m}); }
+}, {passive: true});
+
+// 2. call-to-action buttons
+document.getElementById("h-cta").addEventListener("click", () => tr("cta_click", {cta: "hero_start", hero_percent: Math.round(heroTargetNow() * 100)}));
+document.getElementById("next-step").addEventListener("click", () => tr("cta_click", {cta: "next_step"}));
+
+// 3. which section is on screen, and for how long
+const SECTIONS = [["hero", document.getElementById("hero")], ["design", document.getElementById("h-design").closest(".sec")],
+  ["questions", document.getElementById("h-q").closest(".sec")], ["result", document.getElementById("result")]];
+const ORDER = SECTIONS.map(s => s[0]);
+const inView = {}, viewed = new Set();
+const io = new IntersectionObserver(entries => {
+  for (const e of entries){
+    const name = SECTIONS.find(s => s[1] === e.target)[0];
+    if (e.isIntersecting && (e.intersectionRatio >= .35 || e.intersectionRect.height >= innerHeight * .35)){
+      if (!inView[name]) inView[name] = performance.now();
+      if (!viewed.has(name)){ viewed.add(name); tr("section_view", {section: name, seconds_since_load: secs(T0)}); }
+      if (ORDER.indexOf(name) > ORDER.indexOf(furthest)) furthest = name;
+    } else if (inView[name]){
+      tr("section_time", {section: name, seconds: secs(inView[name])}); delete inView[name];
+    }
+  }
+}, {threshold: [0, .02, .05, .1, .2, .35, .5]});
+SECTIONS.forEach(s => s[1] && io.observe(s[1]));
+
+// 4. every choice, including what it replaced and how many times that group was changed
+const GROUPS = {base: "stole_color", logo: "logo_color", left: "left_logo", right: "right_logo"};
+const lastVal = {base: S.base, logo: S.logo, left: S.left, right: S.right};
+document.addEventListener("change", ev => {
+  const t = ev.target;
+  if (GROUPS[t.name]){
+    interacted = true; totalChanges++; changeCount[t.name] = (changeCount[t.name] || 0) + 1;
+    tr("option_select", {group: GROUPS[t.name], value: t.value, from_value: lastVal[t.name], nth_change: changeCount[t.name], seconds_since_load: secs(T0)});
+    lastVal[t.name] = t.value;
+    // a colour change can force a new emblem colour; record that too
+    if (t.name === "base" && S.logo !== lastVal.logo){ tr("option_select", {group: "logo_color", value: S.logo, from_value: lastVal.logo, nth_change: 0, auto: "yes"}); lastVal.logo = S.logo; }
+  }
+  if (["buy", "qty", "one"].includes(t.name)) tr("question_answer", {question: {buy: "price_range", qty: "quantity", one: "one_color"}[t.name], value: t.value});
+  if (t.id === "q-college") tr("question_answer", {question: "college", value: t.value || "未填"});
+  if (t.id === "yL" || t.id === "yR"){ interacted = true; totalChanges++; tr("position_change", {side: t.id === "yL" ? "left" : "right", value: +t.value, method: "slider"}); }
+});
+
+// 5. options people hover over (desktop only): a "considered but maybe not chosen" signal
+if (!IS_MOBILE){
+  let hov = null;
+  document.addEventListener("pointerover", ev => {
+    const lab = ev.target.closest && ev.target.closest(".choices label.sw, .choices label.opt");
+    if (!lab || (hov && hov.lab === lab)) return;
+    endHover();
+    const inp = document.getElementById(lab.htmlFor);
+    if (inp && GROUPS[inp.name] && !inp.disabled) hov = {lab, group: GROUPS[inp.name], value: inp.value, t: performance.now()};
+  });
+  function endHover(){
+    if (!hov) return;
+    const ms = Math.round(performance.now() - hov.t);
+    if (ms >= 500) tr("option_preview", {group: hov.group, value: hov.value, dwell_ms: Math.min(ms, 60000)});
+    hov = null;
+  }
+  document.addEventListener("pointerout", ev => { if (hov && !hov.lab.contains(ev.relatedTarget)) endHover(); });
+}
+
+// 6. dragging emblems on the preview, and double-click resets
+let dragStart = null;
+cv.addEventListener("pointerdown", () => { dragStart = {yL: S.yL, yR: S.yR}; });
+cv.addEventListener("pointerup", () => {
+  if (!dragStart) return;
+  for (const [k, side] of [["yL", "left"], ["yR", "right"]]) if (S[k] !== dragStart[k]){ interacted = true; totalChanges++; tr("position_change", {side, value: Math.round(S[k]), method: "drag"}); }
+  dragStart = null;
+});
+document.querySelectorAll(".rw").forEach(w => w.addEventListener("dblclick", () => tr("position_change", {side: w.querySelector("input").id === "yL" ? "left" : "right", value: 34, method: "reset"})));
+
+// 7. submit outcome, plus a full snapshot of the final design
+window.__trackSubmit = (stage, extra) => {
+  if (stage === "ok"){
+    submitted = true;
+    tr("submit_result", {result: "ok", verified: window.__verified === false ? "no" : "yes"});
+    tr("design_final", {stole_color: S.base, logo_color: S.logo, left_logo: S.left, right_logo: S.right,
+      combo: S.base + "|" + S.logo + "|" + S.left + "|" + S.right, pos_left: Math.round(S.yL), pos_right: Math.round(S.yR),
+      price_range: S.buy, quantity: S.qty, one_color: S.one, college: document.getElementById("q-college").value || "未填",
+      total_changes: totalChanges, seconds_to_submit: secs(T0), hero_percent: Math.max(0, ...heroMarks)});
+  } else tr(stage === "try" ? "submit_attempt" : "submit_result", extra || {});
+};
+
+// 8. people who designed something but left without submitting: what they had on screen
+function sendAbandon(){
+  if (submitted || !interacted) return;
+  for (const n in inView) tr("section_time", {section: n, seconds: secs(inView[n])});
+  tr("design_abandon", {stole_color: S.base, logo_color: S.logo, left_logo: S.left, right_logo: S.right,
+    total_changes: totalChanges, seconds_on_page: secs(T0), furthest_section: furthest,
+    answered: [S.buy && "price", S.qty && "qty", S.one && "one"].filter(Boolean).join(",") || "none", transport_type: "beacon"});
+  interacted = false; // send once per visit
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") sendAbandon(); });
+window.addEventListener("pagehide", sendAbandon);
+
 })();
 </script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad" async defer></script>

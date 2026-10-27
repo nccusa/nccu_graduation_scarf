@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-TUL9XTU1dNi2paHaWodw/kee2ayYmr20ZDlyCrR2H3w=' 'sha256-kdMAr91+qGdlk0tCe0n3ZqeuKDmm4nMVfPFzbL60F64=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ObIpnIfBueChuAZnyyo/Z+/zAjJEWRvz0sDh1AN8Xl4=' 'sha256-kdMAr91+qGdlk0tCe0n3ZqeuKDmm4nMVfPFzbL60F64=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -12,7 +12,7 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-QJR54LK9SD', Object.assign({ allow_google_signals: false, allow_ad_personalization_signals: false }, /[?&]debug/.test(location.search) ? { debug_mode: true } : {}));
+  gtag('config', 'G-QJR54LK9SD', Object.assign({ allow_google_signals: false, allow_ad_personalization_signals: false }, /[?&]debug(=|&|$)/.test(location.search) ? { debug_mode: true } : {}));
 </script>
 <link rel="preload" as="image" href="f000.webp">
 <link rel="preload" as="image" href="base-navy.webp">

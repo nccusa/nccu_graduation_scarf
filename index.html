@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ObIpnIfBueChuAZnyyo/Z+/zAjJEWRvz0sDh1AN8Xl4=' 'sha256-4DrmIs7C6wiG3hJ5tPgjj5P/r03FTfue0L2VJm4rsqY=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ObIpnIfBueChuAZnyyo/Z+/zAjJEWRvz0sDh1AN8Xl4=' 'sha256-EZtPldsHXDJTTUnai3eq3o3oyuR2tRJ9ScVqbggudCY=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -564,15 +564,14 @@ function tinted(key, color){
 }
 const base = () => BASES.find(b => b.id === S.base);
 const border = () => BORDERS.find(b => b.id === S.border);
-// emblem thread colours, all within the brand manual: reverse white, brand blue, single-colour dark, silver foil
+// embroidery thread colours, all within the brand manual: reverse white, brand blue, single-colour dark
 const LOGOS = [
   {id:"white",  name:"白",     pt:"反白",          hex:"#FFFFFF"},
   {id:"navy",   name:"品牌藍", pt:"PANTONE 288 C", hex:"#23417D"},
-  {id:"ink",    name:"墨灰",   pt:"單色",          hex:"#34383F"},
-  {id:"silver", name:"銀",     pt:"燙銀",          hex:"#B9BDC4"}
+  {id:"ink",    name:"墨灰",   pt:"單色",          hex:"#34383F"}
 ];
 // which thread colours read clearly on each satin; the first is the default (it matches the piping)
-const LOGO_OK = {navy:["white","silver"], red:["white","silver","ink"], pearl:["ink","navy"], stone:["ink","navy"]};
+const LOGO_OK = {navy:["white"], red:["white"], pearl:["ink","navy"], stone:["ink","navy"]};
 const logo = () => LOGOS.find(l => l.id === S.logo) || LOGOS[0];
 const logoColor = () => logo().hex;
 
@@ -720,7 +719,7 @@ function syncBorderAvailability(){
   const nm = document.getElementById("base-name"); if (nm) nm.textContent = `${base().name}　${base().pt}`;
   document.getElementById("vi-code").textContent = "*備註";
   document.getElementById("vi-text").textContent = dark
-    ? "深色底可用反白或燙銀；與底色太接近、看不清楚的顏色已停用。"
+    ? "深色底一律使用反白繡線，對比最清楚；其他顏色已停用。"
     : "淺色底可用單色墨灰或品牌藍；與底色太接近、看不清楚的顏色已停用。";
 }
 function syncLogoName(){ const n = document.getElementById("logo-name"); if (n) n.textContent = `${logo().name}　${logo().pt}`; }

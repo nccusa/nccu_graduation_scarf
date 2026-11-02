@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ObIpnIfBueChuAZnyyo/Z+/zAjJEWRvz0sDh1AN8Xl4=' 'sha256-5Ovh+CZt1ruW6/skDSCmgYIIIky+dnElcv6h/OvpXQA=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ObIpnIfBueChuAZnyyo/Z+/zAjJEWRvz0sDh1AN8Xl4=' 'sha256-WBsT3v7uQx/pyidDEaLQXvFbPqxq1HJF+I/SnxjvT7c=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -75,6 +75,8 @@ body{background:var(--bg);color:var(--fg);font-family:var(--cjk);font-size:15px;
 .by{display:none}
 .ft-sa{display:flex;gap:14px;align-items:flex-start}
 .ft-sa img{height:40px;width:auto;flex:none}
+.canvas-bg{position:relative}
+.zoom-btn{display:none}
 .bar{height:14px;background:var(--fg)}
 
 /* ---------- hero ---------- */
@@ -306,7 +308,10 @@ footer a:hover,.faq a:hover{color:var(--accent);text-decoration-color:currentCol
   .studio{grid-template-columns:1fr;gap:20px}
   .stage{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:#fff;grid-template-columns:auto minmax(0,1fr);align-items:center;justify-items:stretch;gap:14px;padding-block:8px;margin-inline:calc(-1 * max(16px, env(safe-area-inset-left, 0px)));padding-inline:max(16px, env(safe-area-inset-left, 0px));border-bottom:1px solid var(--line);box-shadow:0 10px 16px -14px rgba(0,0,0,.25)}
   .canvas-bg{width:auto}
-  .stage canvas{width:min(44vw, 30svh, 260px)}
+  .stage canvas{width:min(46vw, 21svh, 230px);aspect-ratio:760/1254}
+  .zoom-btn{display:inline-flex;align-items:center;gap:4px;position:absolute;left:50%;bottom:6px;transform:translateX(-50%);border:1px solid var(--line);background:rgba(255,255,255,.92);color:var(--fg);font:600 11.5px var(--cjk);padding:5px 9px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.12);white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .zoom-btn svg{width:12px;height:12px}
+  .zoom-btn[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
   .pos{width:100%;border:0;padding:0;gap:2px;background:transparent}
   .pos-h span{display:none}
   .tgl{margin-left:auto;font-size:12px}
@@ -386,7 +391,7 @@ footer a:hover,.faq a:hover{color:var(--accent);text-decoration-color:currentCol
     </div>
     <div class="studio">
       <div class="stage" id="stage">
-        <div class="canvas-bg"><canvas id="cv" width="1254" height="1254" aria-label="領巾預覽，可上下拖曳校徽與校名"></canvas></div>
+        <div class="canvas-bg"><canvas id="cv" width="1254" height="1254" aria-label="領巾預覽，可上下拖曳校徽與校名"></canvas><button type="button" class="zoom-btn" id="zoomBtn" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.4 10.4 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>近看刺繡</span></button></div>
         <div class="pos">
           <div class="pos-h"><b>位置</b><span>從頸後量起</span></div>
           <label class="sl" for="yL">左側校徽<span class="rw" style="--d:0.34" title="雙擊回到標準位置"><input type="range" id="yL" min="0" max="100" value="34" aria-describedby="pos-tip"><i class="tick" aria-hidden="true"></i><b class="tick-l" aria-hidden="true">標準</b></span><output id="oL" for="yL"></output></label>
@@ -546,10 +551,23 @@ const S = {base:"navy", border:"white", logo:"white", left:"circ_en", right:"ref
 
 // ---------- geometry ----------
 // The product photos are 1254 x 1254; the canvas shows them whole.
-const LW = 1254, LH = 1254, OX = 0, OY = 0, SW = 1254, SH = 1254;
+const SW = 1254, SH = 1254;
+// view window into the photo: the whole stole on desktop; on phones the whole stole trimmed of side margins,
+// plus an optional close-up that puts the two strips side by side so the embroidery reads large
+let LW = 1254, LH = 1254, OX = 0, OY = 0, ZOOM = false;
+const isPhone = () => matchMedia("(max-width:900px)").matches;
+const zoomOn = () => ZOOM && isPhone();
+function setView(){
+  if (isPhone()){ LW = 760; LH = 1254; OX = -247; OY = 0; }
+  else { LW = 1254; LH = 1254; OX = 0; OY = 0; }
+}
 const PX_PER_CM = 14.4;
 const STRIP_L = [271,458], STRIP_R = [795,984];          // outer edges incl. piping
 const CX_L = 362.5, CX_R = 891.5, TOP = 32, BOT = 1218;  // strip centres, top of neck, hem
+// close-up: both strips cut out and placed next to each other, window follows the emblems
+const ZL = [STRIP_L[0]-8, STRIP_L[1]+8], ZR = [STRIP_R[0]-8, STRIP_R[1]+8], ZGAP = 16;
+const ZW = (ZL[1]-ZL[0]) + ZGAP + (ZR[1]-ZR[0]), ZH = ZW * 1254/760;
+let zFrozen = null;
 const Y_MIN = 330, Y_MAX = 1080;                         // emblem centre range
 const yFrom = p => Y_MIN + (Y_MAX - Y_MIN) * p/100;
 
@@ -654,22 +672,47 @@ function drawRuler(c, gown){
 const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
 let active = null, dragging = null;
 function sizeCanvas(){
+  setView();
   const r = cv.getBoundingClientRect(); const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
   const w = Math.max(240, Math.round(r.width * dpr)); cv.width = w; cv.height = Math.round(w * LH/LW);
   render();
 }
+function zoomTop(){
+  if (zFrozen !== null) return zFrozen;
+  const bx = emblemBoxes(), cy = (bx.left.y + bx.left.h/2 + bx.right.y + bx.right.h/2)/2;
+  return Math.max(0, Math.min(1254 - ZH, cy - ZH/2));
+}
+const zoomCv = document.createElement("canvas");
 function render(){
   if (!imgs.seal || !imgs.base_navy) return;
-  const k = cv.width/LW; ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height);
-  ctx.setTransform(k,0,0,k,OX*k,OY*k);
-  drawStole(ctx,{gown:S.gown, active: dragging || active, scale: Math.min(3, k*1.5)});
-  if (S.ruler) drawRuler(ctx, S.gown);
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height);
+  if (zoomOn()){
+    const k = cv.width/ZW, y0 = zoomTop(), wl = ZL[1]-ZL[0], wr = ZR[1]-ZR[0];
+    zoomCv.width = Math.ceil(1254*k); zoomCv.height = Math.ceil(1254*k);
+    const zx = zoomCv.getContext("2d"); zx.setTransform(k,0,0,k,0,0);
+    drawStole(zx,{gown:false, active: dragging || active, scale: Math.min(3.5, k*1.5)});
+    ctx.fillStyle = "#fff"; ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.drawImage(zoomCv, ZL[0]*k, y0*k, wl*k, ZH*k, 0, 0, wl*k, ZH*k);
+    ctx.drawImage(zoomCv, ZR[0]*k, y0*k, wr*k, ZH*k, (wl+ZGAP)*k, 0, wr*k, ZH*k);
+  } else {
+    const k = cv.width/LW;
+    ctx.setTransform(k,0,0,k,OX*k,OY*k);
+    drawStole(ctx,{gown:S.gown, active: dragging || active, scale: Math.min(3, k*1.5)});
+    if (S.ruler) drawRuler(ctx, S.gown);
+  }
   document.getElementById("oL").value = cmLabel(S.yL);
   document.getElementById("oR").value = cmLabel(S.yR);
 }
 function cmLabel(p){ return Math.round((yFrom(p) - TOP)/PX_PER_CM) + " cm"; }
 
-function toLogical(ev){ const r = cv.getBoundingClientRect(), k = LW/r.width; return {x:(ev.clientX - r.left)*k - OX, y:(ev.clientY - r.top)*k - OY}; }
+function toLogical(ev){
+  const r = cv.getBoundingClientRect();
+  if (zoomOn()){
+    const k = ZW/r.width, x = (ev.clientX - r.left)*k, y = (ev.clientY - r.top)*k + zoomTop(), wl = ZL[1]-ZL[0];
+    return {x: x < wl + ZGAP/2 ? ZL[0] + x : ZR[0] + (x - wl - ZGAP), y};
+  }
+  const k = LW/r.width; return {x:(ev.clientX - r.left)*k - OX, y:(ev.clientY - r.top)*k - OY};
+}
 function hit(p){
   const bx = emblemBoxes();
   for (const k of ["left","right"]){ const e = bx[k]; if (p.x > e.x-20 && p.x < e.x+e.w+20 && p.y > e.y-20 && p.y < e.y+e.h+20) return k; }
@@ -678,6 +721,7 @@ function hit(p){
 let grabOff = 0;
 cv.addEventListener("pointerdown", ev => {
   const p = toLogical(ev), h = hit(p); if (!h) return;
+  zFrozen = zoomOn() ? zoomTop() : null;
   dragging = h; cv.setPointerCapture(ev.pointerId); cv.classList.add("dragging");
   grabOff = p.y - yFrom(h === "left" ? S.yL : S.yR); render();
 });
@@ -689,7 +733,13 @@ cv.addEventListener("pointermove", ev => {
   if (dragging === "left"){ S.yL = pct; document.getElementById("yL").value = pct; } else { S.yR = pct; document.getElementById("yR").value = pct; }
   render();
 });
-const endDrag = () => { if (!dragging) return; dragging = null; cv.classList.remove("dragging"); render(); };
+const endDrag = () => { if (!dragging) return; dragging = null; zFrozen = null; cv.classList.remove("dragging"); render(); };
+const zoomBtn = document.getElementById("zoomBtn");
+if (zoomBtn) zoomBtn.addEventListener("click", () => {
+  ZOOM = !ZOOM; zoomBtn.setAttribute("aria-pressed", ZOOM); zoomBtn.querySelector("span").textContent = ZOOM ? "看全貌" : "近看刺繡";
+  sizeCanvas();
+  try { if (window.gtag) gtag("event", "preview_zoom", {mode: ZOOM ? "zoom" : "full"}); } catch(e){}
+});
 cv.addEventListener("pointerup", endDrag); cv.addEventListener("pointercancel", endDrag);
 cv.addEventListener("pointerleave", () => { if (!dragging && active){ active = null; render(); } });
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ObIpnIfBueChuAZnyyo/Z+/zAjJEWRvz0sDh1AN8Xl4=' 'sha256-938834t13YQfJAdYCzJZFpQZ9AI+C8WPyYD9dKnbLxA=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ObIpnIfBueChuAZnyyo/Z+/zAjJEWRvz0sDh1AN8Xl4=' 'sha256-f/TlCsWKL7IlFV3zUdo2jS5cLC8DHROHtRg8dPxSHTs=' https://www.googletagmanager.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://elcphnjrswnclggxjlbd.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJR54LK9SD"></script>
@@ -280,6 +280,19 @@ footer a:hover,.faq a:hover{color:var(--accent);text-decoration-color:currentCol
 .faq dd{margin:0;font-size:14px;line-height:1.7;color:var(--gray);max-width:38em}
 .faq + footer{margin-top:64px}
 
+/* desktop: more breathing room around the poster */
+@media (min-width:901px){
+  .gut{padding-left:clamp(28px,5vw,88px);padding-right:clamp(28px,5vw,88px)}
+  .pin-in{padding-block:clamp(26px,4.5vh,56px)}
+  .botrow,.vert{bottom:clamp(26px,4.5vh,56px)}
+  .hprog{bottom:clamp(22px,4vh,50px)}
+}
+@media (min-width:901px) and (max-width:1200px){
+  .meta{width:290px;padding-right:76px;gap:10px 16px}
+  .sa-cap span{white-space:nowrap}
+  .mid{grid-template-columns:1fr}
+  .mid .cap:not(.sa-cap){display:none}
+}
 @media (max-width:900px){
   .hero{height:520vh}
   .pin-in{padding-block:14px 18px}
@@ -924,8 +937,11 @@ function drawStill(id, alphaLogo, alphaAll){
   }
   hx.restore();
 }
+// the poster block takes on the colour of the stole on show (pearl a shade deeper so it still reads on white)
+const BLOCK_C = {navy:"#23417D", red:"#BE3C32", pearl:"#E3E1DA", stone:"#CFC8BF"};
 function setLabel(li){
   if (li === lastIdx) return; lastIdx = li; const b = BASES[li];
+  blockEl.style.backgroundColor = BLOCK_C[b.id];
   ccIx.textContent = String(li+1).padStart(2,"0") + " / 04"; ccNm.textContent = b.name; ccPt.textContent = b.pt; ccSw.style.background = b.hex;
 }
 function heroFrame(){
